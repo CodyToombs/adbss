@@ -1,0 +1,67 @@
+#!/bin/sh
+
+############################################################
+# Usage
+############################################################
+usage() {
+    cat <<EOF
+
+ADB Screenshot version 1.01
+Usage: $ adbss [OPTIONS]
+
+Options:
+ -s <serial_number>
+ -h, --help    Displays this help.
+
+EOF
+}
+
+############################################################
+# Error handler
+#
+# Prints error message (if one is reported) and then exits with error code 1
+############################################################
+error_exit()
+{
+    echo "ERROR: ${1:-"Unknown Error"}" 1>&2
+    exit 1
+}
+
+############################################################
+# Main
+############################################################
+TARGET_DEVICE=
+
+# Check parameters
+while [ "$1" != "" ]; do
+    case $1 in
+        -s )					shift
+								TARGET_DEVICE="-s "$1
+                                ;;
+        -h | --help )           usage
+                                exit 0
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+# Generate a filename for the screenshot with a timestamp
+name="screen_"`date +%Y-%m-%d_%H-%M-%S`".png"
+
+# Tell device to take a screenshot and store it at /sdcard/ with the generated $name
+adb $TARGET_DEVICE shell screencap -p /sdcard/$name || error_exit "Failed to take screenshot" "$OUTPUT"
+
+# Copy the image file to the local computer
+adb $TARGET_DEVICE pull /sdcard/$name || error_exit "${1:-"Failed to copy file."}\nThe screenshot is still available on the remote device at /sdcard/$name" "$OUTPUT"
+
+echo "Saved: $name"
+
+# Cleanup: Delete the image file from the remote device.
+adb $TARGET_DEVICE shell rm /sdcard/$name || error_exit "Failed to delete the image on the remote device." "$OUTPUT"
+
+exit 0
+
+
+
