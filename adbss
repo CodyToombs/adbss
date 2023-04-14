@@ -6,7 +6,7 @@
 usage() {
     cat <<EOF
 
-ADB Screenshot version 1.01
+ADB Screenshot version 1.1
 Usage: $ adbss [OPTIONS]
 
 Options:

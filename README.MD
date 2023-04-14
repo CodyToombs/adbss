@@ -6,7 +6,14 @@ ADBSS is a simple convenience shell script that uses adb to capture screenshots 
 Usage
 ===========
 <pre>
-$ adbss [-s DeviceID]
+Usage:
+$ adbss [OPTIONS]
+
+Options:
+ -s <serial_number>     Use device with given serial number
+                        Get serial numbers with: 'adb devices -l'
+ -l, --loop             Loop Mode
+ -h, --help             Displays this help
 </pre>
 
 Screenshots are automatically named with a timestamp in YMD_HMS format (e.g. screen_2021-12-29_03-50-43.png) and downloaded to the current directory.
