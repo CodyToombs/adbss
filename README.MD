@@ -11,16 +11,18 @@ $ adbss [-s DeviceID]
 
 Screenshots are automatically named with a timestamp in YMD_HMS format (e.g. screen_2021-12-29_03-50-43.png) and downloaded to the current directory.
 
-When only a single device is connected, `adbss` can be used by itself. If there are multiple devices, use the -s flag along with a device serial number to identify which device should be used. Use `adb devices -l` to see a list of serial numbers for connected devices.
+When only a single device is connected, `adbss` can be used by itself. If there are multiple devices, use the `-s` flag along with a device serial number to identify which device should be used. Use `adb devices -l` to see a list of serial numbers for connected devices.
 
-Note: Screenshot files are temporarily stored on the device they're taken from under the /sdcard/ path. If something prevents files from being written there, the script will fail.
+Loop mode: When run normally, the script takes a single screenshot, then exits. If used with the `-l` flag, this mode allows the user to take multiple screenshots without repeatedly running the script. Each screenshot is taken with a press of the spacebar. To exit loop mode and the script, press the `q` key.
+
+Note: Screenshot files are temporarily stored with the same filename at /sdcard/ on the device they're taken on. If something prevents files from being written there, the script will fail.
 
 Requirements
 ------------
 
  * Current version of adb must be installed and included in your system or user path.
- * adbss must be executable — `chmod +x adbss`
- * [Optional] adbss should also be added to your path as well, so it can be easily used from any location.
+ * adbss must be executable - `chmod +x adbss`
+ * [Optional] adbss should also be added to your path so it can be easily used from any location.
 
 License
 ------------

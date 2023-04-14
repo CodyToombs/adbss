@@ -10,11 +10,37 @@ ADB Screenshot version 1.01
 Usage: $ adbss [OPTIONS]
 
 Options:
- -s <serial_number>
- -h, --help    Displays this help.
+ -s <serial_number>     Use device with given serial number
+                        Get serial numbers with: 'adb devices -l'
+ -l, --loop             Loop Mode
+ -h, --help             Displays this help
 
 EOF
 }
+
+############################################################
+# Take screenshot
+#
+# Take a screen on the remote device.
+############################################################
+take_screenshot()
+{
+    # Generate a filename for the screenshot with a timestamp
+    name="screen_"`date +%Y-%m-%d_%H-%M-%S`".png"
+
+    echo "Saving: $name"
+
+    # Tell device to take a screenshot and store it at /sdcard/ with the generated $name
+    adb $TARGET_DEVICE shell screencap -p /sdcard/$name || error_exit "Failed to take screenshot" "$OUTPUT"
+
+    # Copy the image file to the local computer
+    adb $TARGET_DEVICE pull /sdcard/$name || error_exit "${1:-"Failed to copy file."}\nThe screenshot is still available on the remote device at /sdcard/$name" "$OUTPUT"
+
+    # Cleanup: Delete the image file from the remote device.
+    adb $TARGET_DEVICE shell rm /sdcard/$name || error_exit "Failed to delete the image on the remote device." "$OUTPUT"
+}
+
+
 
 ############################################################
 # Error handler
@@ -27,16 +53,21 @@ error_exit()
     exit 1
 }
 
+
+
 ############################################################
 # Main
 ############################################################
 TARGET_DEVICE=
+LOOP_MODE=
 
 # Check parameters
 while [ "$1" != "" ]; do
     case $1 in
-        -s )					shift
+        -s )                    shift
 								TARGET_DEVICE="-s "$1
+                                ;;
+        -l | --loop )           LOOP_MODE=true
                                 ;;
         -h | --help )           usage
                                 exit 0
@@ -47,19 +78,24 @@ while [ "$1" != "" ]; do
     shift
 done
 
-# Generate a filename for the screenshot with a timestamp
-name="screen_"`date +%Y-%m-%d_%H-%M-%S`".png"
 
-# Tell device to take a screenshot and store it at /sdcard/ with the generated $name
-adb $TARGET_DEVICE shell screencap -p /sdcard/$name || error_exit "Failed to take screenshot" "$OUTPUT"
+if [ $LOOP_MODE = true ]; then
 
-# Copy the image file to the local computer
-adb $TARGET_DEVICE pull /sdcard/$name || error_exit "${1:-"Failed to copy file."}\nThe screenshot is still available on the remote device at /sdcard/$name" "$OUTPUT"
+    while true; do
+        IFS= read -n1 -s -r -p "Press spacebar to take a screenshot, or 'q' to quit..." key
 
-echo "Saved: $name"
-
-# Cleanup: Delete the image file from the remote device.
-adb $TARGET_DEVICE shell rm /sdcard/$name || error_exit "Failed to delete the image on the remote device." "$OUTPUT"
+        if [ "$key" == ' '  ]; then
+            take_screenshot
+        elif [ "$key" = 'q' ] || [ "$key" = 'Q' ]; then
+            echo "Exiting..."
+            break
+        else
+            echo "Wrong key"
+        fi
+    done
+else
+    take_screenshot
+fi            
 
 exit 0
 
