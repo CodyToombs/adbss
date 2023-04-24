@@ -59,7 +59,7 @@ error_exit()
 # Main
 ############################################################
 TARGET_DEVICE=
-LOOP_MODE=
+LOOP_MODE=false
 
 # Check parameters
 while [ "$1" != "" ]; do
@@ -84,7 +84,7 @@ if [ $LOOP_MODE = true ]; then
     while true; do
         IFS= read -n1 -s -r -p "Press spacebar to take a screenshot, or 'q' to quit..." key
 
-        if [ "$key" == ' '  ]; then
+        if [ "$key" = ' '  ]; then
             take_screenshot
         elif [ "$key" = 'q' ] || [ "$key" = 'Q' ]; then
             echo "Exiting..."
